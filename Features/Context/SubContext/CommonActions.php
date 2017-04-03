@@ -231,17 +231,45 @@ trait CommonActions
     }
 
     /**
-     * @Given I click (on) the content tree with path :path
-     * @Then I see :path in the content tree
-     * Explores the content tree, expanding it and click on the desired element
+     * @Then There is not a content :path
+     * @Then There isn't a content :path
+     * Explores the finder of the UDW, verify the desired element doesn't exist and close the UDW.
      *
-     * @param   string  $path    The content tree path such as 'Content1/Content2/ContentIWantToClick'
+     * @param   string  $path    The content browse path such as 'Content1/Content2/ContentIWantToClick'
      */
-    public function clickOnTreePath($path)
+    public function verifyContentIsMissing($path)
     {
-        $node = $this->findWithWait('.ez-view-discoverybarview');
-        $this->clickDiscoveryBar('Content tree');
-        $this->openTreePath($path, $node);
+        $this->clickNavigationItem('Content structure');
+        $this->dontSeeBrowsePath($path);
+        $this->cancelSelection();
+    }
+
+    /**
+     * @Then There is a content :path
+     * Explores the finder of the UDW, find the desired element and close the UDW.
+     *
+     * @param   string  $path    The content browse path such as 'Content1/Content2/ContentIWantToClick'
+     */
+    public function verifyContent($path)
+    {
+        $this->clickNavigationItem('Content structure');
+        $this->clickOnBrowsePath($path);
+        $this->confirmSelection();
+    }
+
+    /**
+     * Explores the UDW, expanding it and click on the desired element.
+     *
+     * @param   string  $path    The content browse path such as 'Content1/Content2/ContentIWantToClick'
+     */
+    public function clickOnBrowsePath($path)
+    {
+        $this->clickDiscoveryBar('Content browse');
+        $this->waitWhileLoading('.is-universaldiscovery-hidden');
+        $node = $this->findWithWait('.ez-view-universaldiscoveryview');
+        $node = $this->findWithWait('.ez-view-universaldiscoveryfinderview .ez-ud-finder-explorerlevel', $node);
+
+        $this->openFinderExplorerPath($path, $node);
     }
 
     /**
@@ -287,11 +315,22 @@ trait CommonActions
 
     /**
      * @When I confirm the selection
-     * Confirm selection in Universal descovery.
+     * Confirm selection in Universal discovery.
      */
     public function confirmSelection()
     {
-        $this->clickElementByText('Confirm selection', '.ez-universaldiscovery-confirm');
+        $elem = $this->findWithWait('.ez-view-universaldiscoveryview');
+        $elem->find('css', '.ez-universaldiscovery-confirm')->click();
+    }
+
+    /**
+     * @When I cancel the selection
+     * Cancel the selection in Universal discovery.
+     */
+    public function cancelSelection()
+    {
+        $elem = $this->findWithWait('.ez-view-universaldiscoveryview');
+        $elem->find('css', '.ez-universaldiscovery-cancel')->click();
     }
 
     /**
@@ -306,11 +345,12 @@ trait CommonActions
     /**
      * Opens a content in PlatformUi.
      */
-    private function goToContentWithPath($path)
+    public function goToContentWithPath($path)
     {
         $this->clickNavigationZone('Content');
         $this->clickNavigationItem('Content structure');
-        $this->clickOnTreePath($path);
+        $this->clickOnBrowsePath($path);
+        $this->confirmSelection();
     }
 
     /**
@@ -325,23 +365,21 @@ trait CommonActions
     }
 
     /**
-     * @Then I don't see :path in the content tree
-     * @Then I do not see :path in the content tree
-     * Explores the content tree, expanding it and click on the desired element.
+     * Explores the UDW, to find the desired element.
      *
-     * @param   string  $path    The content tree path such as 'Content1/Content2/ContentIWantToClick'
+     * @param   string  $path    The content browse path such as 'Content1/Content2/ContentIWantToClick'
      */
-    public function dontSeeTreePath($path)
+    public function dontSeeBrowsePath($path)
     {
         $found = true;
         try {
-            $this->clickOnTreePath($path);
+            $this->clickOnBrowsePath($path);
         } catch (\Exception $e) {
             $found = false;
         }
 
         if ($found) {
-            throw new \Exception("Tree path '$path' was found");
+            throw new \Exception("Browse path '$path' was found");
         }
 
         return true;

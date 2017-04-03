@@ -332,58 +332,6 @@ class PlatformUI extends Context
     }
 
     /**
-     * Opens a content tree node based on the root of the tree or a given node.
-     *
-     * @param   string          $text   The text of the node that is going to be opened
-     * @param   NodeElement     $node       The base node to expand from, if null defaults to the content tree root
-     * @return  NodeElement                 The node that was opened
-     */
-    protected function openTreeNode($text, $parentNode)
-    {
-        if ($parentNode && $parentNode->hasClass('is-tree-node-close')) {
-            $toggleNode = $this->findWithWait('.ez-tree-node-toggle', $parentNode, false);
-            if ($toggleNode && $toggleNode->isVisible()) {
-                $toggleNode->click();
-                // after expanding a node we should wait for loading to finish
-                $this->sleep();
-                $this->waitWhileLoading('.is-tree-node-loading');
-            } else {
-                $parentName = $parentNode->getText();
-                throw new \Exception(
-                    "The tree node '$parentName' could not be expanded: " .
-                    ($toggleNode ? 'toggle not visible' : 'toggle not found')
-                );
-            }
-        }
-        // find an '.ez-tree-node' element which contains an '.ez-tree-navigate' with text '$text'
-        $element = $this->getElementByText($text, '.ez-tree-node', '.ez-tree-navigate', $parentNode);
-        if (!$element) {
-            throw new \Exception("The tree node '$text' was not found");
-        }
-
-        return $element;
-    }
-
-    /**
-     * Explores the content tree, expanding it and click on the desired element.
-     *
-     * @param   string       $path    The content tree path such as 'Content1/Content2/ContentIWantToClick'
-     * @param   NodeElement  $node    The base node to expand from
-     */
-    public function openTreePath($path, $node)
-    {
-        $this->waitWhileLoading('.ez-tree-loading');
-
-        $node = $this->findWithWait('.ez-view-treeview.is-tree-loaded', $node);
-        $path = explode('/', $path);
-        foreach ($path as $nodeName) {
-            $node = $this->openTreeNode($nodeName, $node);
-        }
-
-        $this->findWithWait('.ez-tree-navigate', $node)->click();
-    }
-
-    /**
      * Clicks a content browser node based on the root of the browser or a given node.
      *
      * @param   string          $text   The text of the node that is going to be clicked

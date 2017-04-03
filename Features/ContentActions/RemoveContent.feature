@@ -27,7 +27,7 @@ Feature: Remove content
         When I remove "News Flash"
         And I confirm the removal
         Then I am notified that '"News Flash" sent to Trash'
-        And I do not see "News Flash" in the content tree
+        And There is not a content "News Flash"
 
     @javascript
     Scenario: Remove one object and do not confirm the removal
@@ -35,14 +35,14 @@ Feature: Remove content
         When I remove "News Flash"
         And I cancel the removal
         Then I am not notified that '"News Flash" sent to Trash'
-        And I see "News Flash" in the content tree
+        And There is a content "News Flash"
 
     @javascript
     Scenario: Delete one object that has children objects
         Given a "News/News child" article exists
         When I remove "News"
         And I confirm the removal
-        Then I do not see "News" in the content tree
+        Then There is not a content "News"
 
     @javascript
     Scenario: Removing one object should redirect to it's parent location view
@@ -50,4 +50,4 @@ Feature: Remove content
         When I remove "News child"
         And I confirm the removal
         Then I am on the "News" location view
-        And I do not see "News/News child" in the content tree
+        And There is not a content "News/News child"
