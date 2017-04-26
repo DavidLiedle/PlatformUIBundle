@@ -367,6 +367,62 @@ class PlatformUI extends Context
     }
 
     /**
+     * Explores the UDW, expanding it and click on the desired element.
+     *
+     * @param string $path The content browse path such as 'Content1/Content2/ContentIWantToClick'
+     */
+    public function clickOnBrowsePath($path)
+    {
+        $this->clickDiscoveryBar('Content browse');
+        $this->waitWhileLoading('.is-universaldiscovery-hidden');
+        $node = $this->findWithWait('.ez-view-universaldiscoveryview');
+        $node = $this->findWithWait('.ez-view-universaldiscoveryfinderview .ez-ud-finder-explorerlevel', $node);
+
+        $this->openFinderExplorerPath($path, $node);
+    }
+    
+    /**
+     * Explores the UDW, to find the desired element.
+     *
+     * @param   string  $path    The content browse path such as 'Content1/Content2/ContentIWantToClick'
+     */
+    public function dontSeeBrowsePath($path)
+    {
+        $found = true;
+        try {
+            $this->clickOnBrowsePath($path);
+        } catch (\Exception $e) {
+            $found = false;
+        }
+
+        if ($found) {
+            throw new \Exception("Browse path '$path' was found");
+        }
+
+        return true;
+    }
+    
+    /**
+     * @When I confirm the selection
+     * Confirm selection in Universal discovery.
+     */
+    public function confirmSelection()
+    {
+        $elem = $this->findWithWait('.ez-view-universaldiscoveryview');
+        $elem->find('css', '.ez-universaldiscovery-confirm')->click();
+    }
+
+    /**
+     * @When I cancel the selection
+     * Cancel the selection in Universal discovery.
+     */
+    public function cancelSelection()
+    {
+        $elem = $this->findWithWait('.ez-view-universaldiscoveryview');
+        $elem->find('css', '.ez-universaldiscovery-cancel')->click();
+    }
+    
+    /**
      * Close the "Confirm" modal dialog, if it is visible.
      */
     protected function closeConfirmBox()

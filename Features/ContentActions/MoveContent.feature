@@ -18,12 +18,12 @@ Feature: Move content
         And I select the "eZ Platform/Older News" folder in the Universal Discovery Widget
         And I confirm the selection
         Then I am notified that "News Flash" has been moved under "Older News"
-        And There is a content "Older News/News Flash"
-        And There is not a content "Origin/News flash"
+        And the content item was moved to "Older News/News Flash"
+        And the content item "Origin/News flash" was removed
 
     @javascript
     Scenario: Move one object that has children objects
         Given an "Older News" folder exists
         And a "Tomorrow news/News Flash" article exists
         When I move "Tomorrow news" into the "Older News" folder
-        And There is a content "Older News/Tomorrow news/News Flash"
+        And the content item was moved to "Older News/Tomorrow news/News Flash"

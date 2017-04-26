@@ -231,13 +231,15 @@ trait CommonActions
     }
 
     /**
-     * @Then There is not a content :path
-     * @Then There isn't a content :path
+     * @Then :path content item does not exists
+     * @Then :path content item doesn't exists
+     * @Then the content item :path was removed
+     * @Then the content item :path was sent to trash
      * Explores the finder of the UDW, verify the desired element doesn't exist and close the UDW.
      *
-     * @param   string  $path    The content browse path such as 'Content1/Content2/ContentIWantToClick'
+     * @param string $path The content browse path such as 'Content1/Content2/ContentIWantToClick'
      */
-    public function verifyContentIsMissing($path)
+    public function thereIsNoContent($path)
     {
         $this->clickNavigationItem('Content structure');
         $this->dontSeeBrowsePath($path);
@@ -245,31 +247,20 @@ trait CommonActions
     }
 
     /**
-     * @Then There is a content :path
+     * @Then :path content item exists
+     * @Then the content item :path was not removed
+     * @Then the content item :path was not sent to trash
+     * @Then the content item was moved to :path
+     * @Then the content item was copied to :path
      * Explores the finder of the UDW, find the desired element and close the UDW.
      *
-     * @param   string  $path    The content browse path such as 'Content1/Content2/ContentIWantToClick'
+     * @param string $path The content browse path such as 'Content1/Content2/ContentIWantToClick'
      */
-    public function verifyContent($path)
+    public function thereIsAContent($path)
     {
         $this->clickNavigationItem('Content structure');
         $this->clickOnBrowsePath($path);
         $this->confirmSelection();
-    }
-
-    /**
-     * Explores the UDW, expanding it and click on the desired element.
-     *
-     * @param   string  $path    The content browse path such as 'Content1/Content2/ContentIWantToClick'
-     */
-    public function clickOnBrowsePath($path)
-    {
-        $this->clickDiscoveryBar('Content browse');
-        $this->waitWhileLoading('.is-universaldiscovery-hidden');
-        $node = $this->findWithWait('.ez-view-universaldiscoveryview');
-        $node = $this->findWithWait('.ez-view-universaldiscoveryfinderview .ez-ud-finder-explorerlevel', $node);
-
-        $this->openFinderExplorerPath($path, $node);
     }
 
     /**
@@ -314,26 +305,6 @@ trait CommonActions
     }
 
     /**
-     * @When I confirm the selection
-     * Confirm selection in Universal discovery.
-     */
-    public function confirmSelection()
-    {
-        $elem = $this->findWithWait('.ez-view-universaldiscoveryview');
-        $elem->find('css', '.ez-universaldiscovery-confirm')->click();
-    }
-
-    /**
-     * @When I cancel the selection
-     * Cancel the selection in Universal discovery.
-     */
-    public function cancelSelection()
-    {
-        $elem = $this->findWithWait('.ez-view-universaldiscoveryview');
-        $elem->find('css', '.ez-universaldiscovery-cancel')->click();
-    }
-
-    /**
      * @Given I am on :name full view
      */
     public function onFullView($name)
@@ -362,27 +333,6 @@ trait CommonActions
         // for now only verifies if the title matches
         $this->waitWhileLoading();
         $this->iSeeTitle($name);
-    }
-
-    /**
-     * Explores the UDW, to find the desired element.
-     *
-     * @param   string  $path    The content browse path such as 'Content1/Content2/ContentIWantToClick'
-     */
-    public function dontSeeBrowsePath($path)
-    {
-        $found = true;
-        try {
-            $this->clickOnBrowsePath($path);
-        } catch (\Exception $e) {
-            $found = false;
-        }
-
-        if ($found) {
-            throw new \Exception("Browse path '$path' was found");
-        }
-
-        return true;
     }
 
     /**
